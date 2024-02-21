@@ -40,7 +40,7 @@ beforeAll(done => {
         ioServer.on("connection", (socket: Socket) => {
             // check if userUUID is in query & add userUUID1 to room
             const userUUID = socket.handshake.query.userUUID as string;
-            addUserToRoom(ioServer, socket, testRoomUUID, userUUID);
+            addUserToRoom(socket, testRoomUUID, userUUID);
         });
 
         ioClient1.on("connect", checkDone);
@@ -55,34 +55,28 @@ afterAll(() => {
     httpServer.close();
 });
 
-// @TODO: replace the following with Promise
 test("addUserToRoom should add user to room", done => {
-    if (ioClient2.id === undefined) {
+    if (ioClient2.id === undefined || ioClient1.id === undefined) {
         return;
     }
 
     // userUUID2 joins room
     const socket = ioServer.sockets.sockets.get(ioClient2.id) as Socket;
-    addUserToRoom(ioServer, socket, testRoomUUID, userUUID2);
+    addUserToRoom(socket, testRoomUUID, userUUID2);
 
     expect(roomToUsers.get(testRoomUUID)?.has(userUUID1)).toBeTruthy();
 
-    // userUUID1 listens for self-joined
-    ioClient2.on("self-joined", () => {
-        expect(roomToUsers.get(testRoomUUID)?.has(userUUID2)).toBeTruthy();
-        done();
-    });
-
-    // @TODO: it seems that the user who joined is not receiving the message
+    // userUUID1 listens for member-joined
     ioClient2.on("member-joined", () => {
-        done();
+        expect(roomToUsers.get(testRoomUUID)?.has(userUUID2)).toBeTruthy();
     });
 
     // userUUID2 listens for member-joined
     ioClient1.on("member-joined", (data: any) => {
         expect(data.userUUID).toBe(userUUID2);
-        done();
     });
+
+    done();
 });
 
 test("sendMessageToPeer should send message to peer", done => {
@@ -158,6 +152,6 @@ test("removeUserFromRoom should remove user from room", done => {
     const socket = ioServer.sockets.sockets.get(ioClient1.id) as Socket;
     removeUserFromRoom(socket, testRoomUUID, userUUID1);
     expect(roomToUsers.get(testRoomUUID)?.has(userUUID1)).toBeFalsy();
-    addUserToRoom(ioServer, socket, testRoomUUID, userUUID1);
+    addUserToRoom(socket, testRoomUUID, userUUID1);
     done();
 });

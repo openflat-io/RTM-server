@@ -14,4 +14,8 @@ export interface PeerMessageData {
     type: string;
 }
 
+export interface GetRoomUsers {
+    roomUUID: string;
+}
+
 export interface RoomMessageData extends PeerMessageData {}

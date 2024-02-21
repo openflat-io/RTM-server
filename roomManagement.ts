@@ -9,7 +9,6 @@ export const userToSocket = new Map<string, string>();
 export const roomToUsers = new Map<string, Set<string>>();
 
 export async function addUserToRoom(
-    io: Server,
     socket: Socket,
     roomUUID: string,
     userUUID: string,
@@ -24,9 +23,8 @@ export async function addUserToRoom(
         userToSocket.set(userUUID, socket.id);
 
         // send message to the user who joined
-        socket.emit("self-joined", { success: true });
+        socket.emit("member-joined", { userUUID });
 
-        // @TODO: it seems that the user who joined is not receiving the message
         // send message to other users in the room
         socket.to(roomUUID).emit("member-joined", { userUUID });
 
@@ -51,6 +49,9 @@ export function removeUserFromRoom(socket: Socket, roomUUID: string, userUUID: s
 
         // remove user from socket id map
         userToSocket.delete(userUUID);
+
+        // send message to the user who left
+        socket.emit("self-left", { success: true });
 
         // send message to other users in the room
         socket.to(roomUUID).emit("member-left", { userUUID });
@@ -123,6 +124,8 @@ export function getRoomUsers(socket: Socket, roomUUID: string): void {
     try {
         const users = roomToUsers.get(roomUUID) || new Set();
         socket.emit("room-users", { users: Array.from(users) });
+
+        Logger.info(`Getting users in room ${roomUUID} - ${JSON.stringify(Array.from(users))}`);
     } catch (error) {
         Logger.error("Error getting room users", error as Error);
     }
