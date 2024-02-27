@@ -1,7 +1,7 @@
 {
   "name": "rtm-service",
   "version": "1.0.0",
-  "description": "rtm server",
+  "description": "A RTM & RTC server",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
