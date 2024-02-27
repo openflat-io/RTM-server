@@ -14,7 +14,7 @@ import {
     getRoomUsers,
 } from "./roomManagement";
 
-export function setupConnectionHandlers(io: Server, socket: Socket): void {
+export function setupRTMConnectionHandlers(io: Server, socket: Socket): void {
     socket.on("join-room", (data: JoinRoomData) => {
         addUserToRoom(socket, data.roomUUID, data.userUUID);
     });

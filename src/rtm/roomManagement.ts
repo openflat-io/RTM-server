@@ -1,5 +1,5 @@
 import { Socket, Server } from "socket.io";
-import { Logger } from "./logger";
+import { Logger } from "../logger";
 import { PeerMessageData, RoomMessageData } from "./types";
 
 // userUUID -> socket.id

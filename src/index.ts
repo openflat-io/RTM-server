@@ -1,7 +1,8 @@
 import http from 'http';
 import { Server } from 'socket.io';
 import { Logger } from './logger';
-import { setupConnectionHandlers } from './connectionHandlers';
+import { setupRTMConnectionHandlers } from './rtm/connectionHandlers';
+import { setupRTCConnectionHandlers } from './rtc/connectionHandlers';
 
 const server = http.createServer();
 const io = new Server(server, {
@@ -12,7 +13,10 @@ const io = new Server(server, {
 
 io.on('connection', socket => {
     Logger.info(`New connection: ${socket.id}`);
-    setupConnectionHandlers(io, socket);
+
+    // setup connection handlers for RTM & RTC
+    setupRTMConnectionHandlers(io, socket);
+    setupRTCConnectionHandlers(io, socket);
 });
 
 const PORT = 3001;
