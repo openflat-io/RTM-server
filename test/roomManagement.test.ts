@@ -8,7 +8,7 @@ import {
     sendMessage,
     getRoomUsers,
     roomToUsers,
-} from "../../src/roomManagement";
+} from "../src/roomManagement";
 
 let ioServer: IOServer;
 let httpServer: HttpServer;

@@ -1,5 +1,5 @@
 import { Socket, Server } from "socket.io";
-import { Logger } from "../logger";
+import { Logger } from "./logger";
 import { PeerMessageData, RoomMessageData } from "./types";
 
 // userUUID -> socket.id
@@ -14,6 +14,11 @@ export async function addUserToRoom(
     userUUID: string,
 ): Promise<void> {
     try {
+        if (roomToUsers.has(roomUUID) && roomToUsers.get(roomUUID)?.has(userUUID)) {
+            Logger.info(`[member: User ${userUUID} already in room ${roomUUID}]`);
+            return;
+        }
+
         await socket.join(roomUUID);
 
         if (!roomToUsers.has(roomUUID)) {
@@ -28,9 +33,9 @@ export async function addUserToRoom(
         // send message to other users in the room
         socket.to(roomUUID).emit("member-joined", { userUUID });
 
-        Logger.info(`User ${userUUID} joined room ${roomUUID}`);
+        Logger.info(`[member: User ${userUUID} joined room ${roomUUID}]`);
     } catch (error) {
-        Logger.error("Error adding user to room", error as Error);
+        Logger.error("[member: Error adding user to room]", error as Error);
     }
 }
 
@@ -56,9 +61,9 @@ export function removeUserFromRoom(socket: Socket, roomUUID: string, userUUID: s
         // send message to other users in the room
         socket.to(roomUUID).emit("member-left", { userUUID });
 
-        Logger.info(`User ${userUUID} left room ${roomUUID}`);
+        Logger.info(`[member: User ${userUUID} left room ${roomUUID}]`);
     } catch (error) {
-        Logger.error("Error removing user from room", error as Error);
+        Logger.error("[member: Error removing user from room]", error as Error);
     }
 }
 
@@ -93,7 +98,7 @@ export function sendMessageToPeer(
             }
         }
     } catch (error) {
-        Logger.error("Error sending message to peer", error as Error);
+        Logger.error("[rtm: Error sending message to peer]", error as Error);
     }
 }
 
@@ -116,7 +121,7 @@ export function sendMessage(socket: Socket, data: RoomMessageData): void {
             socket.emit("room-message-sent");
         }
     } catch (error) {
-        Logger.error("Error sending message to room", error as Error);
+        Logger.error("[rtm: Error sending message to room]", error as Error);
     }
 }
 
@@ -125,8 +130,10 @@ export function getRoomUsers(socket: Socket, roomUUID: string): void {
         const users = roomToUsers.get(roomUUID) || new Set();
         socket.emit("room-users", { users: Array.from(users) });
 
-        Logger.info(`Getting users in room ${roomUUID} - ${JSON.stringify(Array.from(users))}`);
+        Logger.info(
+            `[member: Getting users in room ${roomUUID} - ${JSON.stringify(Array.from(users))}]`,
+        );
     } catch (error) {
-        Logger.error("Error getting room users", error as Error);
+        Logger.error("[member: Error getting room users]", error as Error);
     }
 }

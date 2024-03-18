@@ -1,8 +1,7 @@
-import http from 'http';
-import { Server } from 'socket.io';
-import { Logger } from './logger';
-import { setupRTMConnectionHandlers } from './rtm/connectionHandlers';
-import { setupRTCConnectionHandlers } from './rtc/connectionHandlers';
+import http from "http";
+import { Server } from "socket.io";
+import { Logger } from "./logger";
+import { setupRTMConnectionHandlers } from "./connectionHandlers";
 
 const server = http.createServer();
 const io = new Server(server, {
@@ -11,15 +10,14 @@ const io = new Server(server, {
     },
 });
 
-io.on('connection', socket => {
-    Logger.info(`New connection: ${socket.id}`);
+io.on("connection", socket => {
+    Logger.info(`[Server: New connection: ${socket.id}]`);
 
-    // setup connection handlers for RTM & RTC
+    // setup connection handlers for RTM
     setupRTMConnectionHandlers(io, socket);
-    setupRTCConnectionHandlers(io, socket);
 });
 
 const PORT = 3001;
 server.listen(PORT, () => {
-    Logger.info(`Server is running on http://localhost:${PORT}`);
+    Logger.info(`[RTM Server: Server is running on http://localhost:${PORT}]`);
 });
