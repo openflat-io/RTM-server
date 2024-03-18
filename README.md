@@ -1,6 +1,6 @@
-# real-time-server
+# RTM server
 
-A RTM & RTC server.Part of RTM currently supports `join-room` `leave-room` `peer-message` `room-message` `get-room-users` and part of RTC supports `rtc-offer` `rtc-answer` `ice-candidate`.
+A RTM server.Currently supports `join-room` `leave-room` `peer-message` `room-message` `get-room-users`.
 
 
 ## License
